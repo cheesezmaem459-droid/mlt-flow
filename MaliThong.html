@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MLT - Maintenance & Insurance System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Prompt', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .mali-card { border-left: 6px solid #059669; background-color: #ecfdf5; }
+        .user-card { border-left: 6px solid #e2e8f0; background-color: #ffffff; }
+        .timeline-line::before {
+            content: ''; position: absolute; top: 24px; bottom: -24px; left: 24px; width: 2px;
+            background-color: #e2e8f0; z-index: 0;
+        }
+        .timeline-item:last-child .timeline-line::before { display: none; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-3">
+                    <div class="bg-emerald-700 text-white p-2 rounded-lg font-bold">MLT</div>
+                    <span class="font-bold text-xl text-slate-800 tracking-tighter uppercase">MALITHONG</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 py-10 space-y-12">
+
+        <section class="text-center space-y-4">
+            <h1 class="text-3xl md:text-5xl font-black text-slate-900 tracking-tighter uppercase">MALITHONGLOGISTICS CO., LTD.</h1>
+            <h2 class="text-2xl font-bold text-slate-700">ระบบรับเรื่องและอนุมัติการแก้ไขปัญหา</h2>
+            <p class="text-slate-500 max-w-2xl mx-auto text-lg">
+                ขั้นตอนการแจ้งเหตุ ซ่อมบำรุง และการเบิกจ่ายผ่านกลุ่ม Line <br class="hidden md:block"> เพื่อความโปร่งใสและตรวจสอบได้ในทุกขั้นตอน
+            </p>
+        </section>
+
+        <section class="bg-white rounded-3xl shadow-xl shadow-slate-200/60 border border-slate-100 overflow-hidden">
+            <div class="p-8 border-b border-slate-100 bg-slate-50/50">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <h2 class="text-xl font-bold flex items-center gap-2 text-slate-800">
+                        <span class="w-2 h-6 bg-emerald-600 rounded-full"></span>
+                        ขั้นตอนการดำเนินงาน
+                    </h2>
+                    <div class="flex p-1 bg-slate-200 rounded-xl w-fit">
+                        <button id="btn-maint" onclick="updateFlow('maint')" class="px-6 py-2 rounded-lg font-bold text-sm transition-all bg-white shadow-sm text-emerald-700">ซ่อมบำรุงตามระยะ</button>
+                        <button id="btn-accident" onclick="updateFlow('accident')" class="px-6 py-2 rounded-lg font-bold text-sm transition-all text-slate-600">แจ้งเหตุ/เคลมประกัน</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6 md:p-10">
+                <div id="flow-display" class="relative space-y-0">
+                </div>
+            </div>
+        </section>
+
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                <h3 class="font-bold text-slate-500 text-xs uppercase tracking-widest mb-2 text-emerald-600">LIMIT / MONTH</h3>
+                <p class="text-2xl font-black text-slate-800">9,000 <span class="text-sm font-normal text-slate-400 font-medium">กม.</span></p>
+            </div>
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                <h3 class="font-bold text-slate-500 text-xs uppercase tracking-widest mb-2 text-emerald-600">MAINTENANCE</h3>
+                <p class="text-2xl font-black text-slate-800">20,000 <span class="text-sm font-normal text-slate-400 font-medium">กม.</span></p>
+            </div>
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                <h3 class="font-bold text-slate-500 text-xs uppercase tracking-widest mb-2 text-emerald-600">TIME PERIOD</h3>
+                <p class="text-2xl font-black text-slate-800">6 <span class="text-sm font-normal text-slate-400 font-medium">เดือน</span></p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-900 text-slate-500 py-10 text-center text-sm">
+        <p>MALITHONGLOGISTICS • 2026 Fleet Maintenance Protocol</p>
+    </footer>
+
+    <script>
+        const flows = {
+            maint: [
+                { title: "เจ้าหน้าที่แจ้งกำหนดเช็คระยะ", desc: "เจ้าหน้าที่แจ้งกำหนด 20,000 กม. หรือ 6 เดือน (ตามเงื่อนไขการใช้งานไม่เกิน 9,000 กม./เดือน)", icon: "📅", type: "mali" },
+                { title: "ผู้เช่า/ผู้ขับ แจ้งข้อมูลในไลน์กลุ่ม", desc: "ระบุ: วันเข้าซ่อม (ล่วงหน้า 24 ชม.), อู่ที่ต้องการ/ให้ผู้เช่าแจ้งศูนย์ในเครือ, เลขไมล์, ชื่อคนขับ, ทะเบียนรถ และชื่อผู้เช่า", icon: "💬", type: "user" },
+                { title: "อนุมัติกรณีความเสียหายฉุกเฉิน", desc: "หากรถเกิดความเสียหายฉุกเฉิน/ซ่อมฉุกเฉิน ทางเจ้าหน้าที่ ตรวจสอบข้อมูลเบื้องต้นและอนุมัติการสั่งซ่อม", icon: "🚨", type: "mali" },
+                { title: "ตรวจสอบงานและปิดเคส", desc: "ตรวจสอบความเรียบร้อยของงานซ่อมและอนุมัติค่าใช้จ่ายตามจริงเพื่อบันทึกข้อมูล", icon: "✅", type: "mali" }
+            ],
+            accident: [
+                { title: "แจ้งเคสผ่านกลุ่ม Line", desc: "ผู้เช่าถ่ายรูปเหตุการณ์และความเสียหายส่งเข้ากลุ่ม Line ทันทีเพื่อขอเบอร์ประกันจากเจ้าหน้าที่", icon: "📸", type: "user" },
+                { title: "เจ้าหน้าที่แจ้งรายละเอียดประกัน", desc: "เจ้าหน้าที่ MALITHONG แจ้งเลขกรมธรรม์และเบอร์โทรศัพท์สำหรับติดต่อประกันภัย", icon: "📞", type: "mali" },
+                { title: "ผู้เช่าประสานงานเจ้าหน้าที่ประกัน", desc: "ผู้เช่า/คนขับ โทรแจ้งประกันและดำเนินการตามขั้นตอนของเจ้าหน้าที่ประกันให้เรียบร้อย", icon: "🚔", type: "user" },
+                { title: "สรุปเคสและแนบใบเคลม", desc: "โน๊ตสรุปเคสลงในกลุ่มไลน์พร้อมแนบรูปถ่ายใบเคลมที่ชัดเจนเพื่อเก็บเป็นหลักฐาน", icon: "📝", type: "user" },
+                { title: "ส่งเอกสารเบิกคืน/ค่าขาดประโยชน์", desc: "กรณีเบิกเงินสำรองจ่ายหรือค่าขาดประโยชน์ ผู้เช่าต้องส่งเอกสารใบเสร็จและภาพการซ่อมจากศูนย์/อู่ เพื่อประกอบการเบิกคืน", icon: "💵", type: "user" },
+                { title: "ติดตามผลและอนุมัติงานซ่อม", desc: "คุมงานกับอู่ประกันจนรถพร้อมใช้งาน และตรวจรับงานก่อนส่งมอบคืน", icon: "🚛", type: "mali" }
+            ]
+        };
+
+        function updateFlow(type) {
+            const container = document.getElementById('flow-display');
+            const btnMaint = document.getElementById('btn-maint');
+            const btnAcc = document.getElementById('btn-accident');
+
+            if(type === 'maint') {
+                btnMaint.className = "px-6 py-2 rounded-lg font-bold text-sm transition-all bg-white shadow-sm text-emerald-700";
+                btnAcc.className = "px-6 py-2 rounded-lg font-bold text-sm transition-all text-slate-600";
+            } else {
+                btnAcc.className = "px-6 py-2 rounded-lg font-bold text-sm transition-all bg-white shadow-sm text-emerald-700";
+                btnMaint.className = "px-6 py-2 rounded-lg font-bold text-sm transition-all text-slate-600";
+            }
+
+            container.innerHTML = flows[type].map((step, i) => `
+                <div class="timeline-item relative flex items-start gap-8 mb-8 group">
+                    <div class="timeline-line absolute left-0 top-0 bottom-0 w-12 flex justify-center">
+                        <div class="w-12 h-12 rounded-full ${step.type === 'mali' ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-100' : 'bg-slate-200 text-slate-500'} flex items-center justify-center text-[11px] font-bold relative z-10">
+                            ${step.type === 'mali' ? 'MLT' : (i+1)}
+                        </div>
+                    </div>
+                    <div class="ml-16 p-6 rounded-2xl flex-grow transition-all ${step.type === 'mali' ? 'mali-card shadow-md' : 'user-card border border-slate-100 shadow-sm'}">
+                        <div class="flex justify-between items-center mb-1">
+                            <h4 class="font-bold text-slate-800">${step.title}</h4>
+                            <span class="text-2xl">${step.icon}</span>
+                        </div>
+                        <p class="text-slate-600 text-sm leading-relaxed">${step.desc}</p>
+                        ${step.type === 'mali' ? '<div class="mt-3 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 uppercase tracking-wider">MALITHONG Controller</div>' : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => updateFlow('maint'));
+    </script>
+</body>
+</html>
